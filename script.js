@@ -122,11 +122,11 @@ function updateBarChart(data) {
     barChartSvg.selectAll("*").remove();
 
     const { width, height } = getContainerDimensions("bar-chart");
-    const dynamicHeight = calculateBarChartHeight(data);
+    const chartHeight = 500; // Fixed height for line chart
 
     // Update SVG height
     d3.select("#bar-chart svg")
-        .attr("height", dynamicHeight);
+        .attr("height", chartHeight);
 
     // Group data by year and calculate average rating
     const yearData = d3.rollup(
@@ -142,17 +142,32 @@ function updateBarChart(data) {
 
     // Create scales
     const x = d3.scaleLinear()
-        .domain([0, d3.max(yearDataArray, d => d.avgRating)])
+        .domain([d3.min(yearDataArray, d => d.year), d3.max(yearDataArray, d => d.year)])
         .range([0, width]);
 
-    const y = d3.scaleBand()
-        .domain(yearDataArray.map(d => d.year))
-        .range([0, dynamicHeight - margin.top - margin.bottom])
-        .padding(0.1);
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(yearDataArray, d => d.avgRating)])
+        .range([chartHeight - margin.top - margin.bottom, 0]);
+
+    // Add grid
+    barChartSvg.append("g")
+        .attr("class", "grid")
+        .call(d3.axisLeft(y)
+            .tickSize(-width)
+            .tickFormat("")
+        );
+
+    barChartSvg.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(0,${chartHeight - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(x)
+            .tickSize(-(chartHeight - margin.top - margin.bottom))
+            .tickFormat("")
+        );
 
     // Add axes
     barChartSvg.append("g")
-        .attr("transform", `translate(0,${dynamicHeight - margin.top - margin.bottom})`)
+        .attr("transform", `translate(0,${chartHeight - margin.top - margin.bottom})`)
         .call(d3.axisBottom(x));
 
     barChartSvg.append("g")
@@ -160,28 +175,41 @@ function updateBarChart(data) {
 
     // Add axis labels
     barChartSvg.append("text")
-        .attr("transform", `translate(${width/2}, ${dynamicHeight - margin.top - margin.bottom + 40})`)
+        .attr("transform", `translate(${width/2}, ${chartHeight - margin.top - margin.bottom + 40})`)
         .style("text-anchor", "middle")
-        .text("Average Rating");
+        .text("Year");
 
     barChartSvg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left + 40)
-        .attr("x", 0 - (dynamicHeight - margin.top - margin.bottom) / 2)
+        .attr("x", 0 - (chartHeight - margin.top - margin.bottom) / 2)
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Year");
+        .text("Average Rating");
 
-    // Add bars
-    barChartSvg.selectAll(".bar")
+    // Create line generator
+    const line = d3.line()
+        .x(d => x(d.year))
+        .y(d => y(d.avgRating))
+        .curve(d3.curveMonotoneX);
+
+    // Add the line
+    barChartSvg.append("path")
+        .datum(yearDataArray)
+        .attr("fill", "none")
+        .attr("stroke", "#2196F3")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+    // Add dots
+    barChartSvg.selectAll(".dot")
         .data(yearDataArray)
         .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", 0)
-        .attr("y", d => y(d.year))
-        .attr("width", d => x(d.avgRating))
-        .attr("height", y.bandwidth())
+        .append("circle")
+        .attr("class", "dot")
+        .attr("cx", d => x(d.year))
+        .attr("cy", d => y(d.avgRating))
+        .attr("r", 4)
         .attr("fill", "#2196F3")
         .on("mouseover", showTooltip)
         .on("mousemove", moveTooltip)
