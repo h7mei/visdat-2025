@@ -96,6 +96,44 @@
                         <div id="scatter-plot" class="w-full h-[700px]"></div>
                     </div>
                 </section>
+
+                <!-- Correlation Matrix Chart -->
+                <section class="mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-2xl font-semibold text-gray-800">Matriks Korelasi Fitur</h2>
+                        <p class="text-gray-600 mt-2">Hubungan antar fitur film</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <!-- Chart Container (70%) -->
+                            <div class="w-full md:w-[70%]">
+                                <div id="correlation-matrix" class="w-full h-[600px] flex items-center justify-center"></div>
+                            </div>
+                            
+                            <!-- Explanation Container (30%) -->
+                            <div class="w-full md:w-[30%] space-y-6">
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Penjelasan Matriks Korelasi</h3>
+                                    <div class="space-y-4 text-gray-600">
+                                        <p>Matriks korelasi ini menunjukkan hubungan antara berbagai fitur film:</p>
+                                        <ul class="list-disc pl-5 space-y-2">
+                                            <li><span class="font-medium">averageRating:</span> Rating rata-rata film</li>
+                                            <li><span class="font-medium">numVotes:</span> Jumlah suara yang diberikan</li>
+                                            <li><span class="font-medium">runtimeMinutes:</span> Durasi film dalam menit</li>
+                                            <li><span class="font-medium">startYear:</span> Tahun rilis film</li>
+                                        </ul>
+                                        <p class="mt-4">Interpretasi warna:</p>
+                                        <ul class="list-disc pl-5 space-y-2">
+                                            <li><span class="text-blue-600">Biru:</span> Korelasi positif (semakin tinggi nilai satu fitur, semakin tinggi nilai fitur lainnya)</li>
+                                            <li><span class="text-red-600">Merah:</span> Korelasi negatif (semakin tinggi nilai satu fitur, semakin rendah nilai fitur lainnya)</li>
+                                            <li><span class="text-gray-400">Abu-abu:</span> Tidak ada korelasi yang signifikan</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
 
@@ -143,6 +181,6 @@
         loadingScreen.style.display = 'flex';
         loadingScreen.style.opacity = '1';
     </script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html> 
